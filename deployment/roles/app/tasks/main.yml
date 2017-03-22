@@ -1,0 +1,53 @@
+- name: Install app specific packages
+  become: True
+  apt: update_cache=yes pkg={{item}} state=present
+  when: app_packages is defined
+  with_items: "{{app_packages|default([])}}"
+
+- name: Add app user
+  user: name={{app_user}} state=present
+  become: True
+  tags:
+    - users
+
+- name: Add app user authorized keys
+  authorized_key: user={{app_user}} key={{lookup('file', inventory_dir + '/keys/' + item.key)}}
+  become: True
+  when: admin_keys is defined
+  with_items: "{{admin_keys|default([])}}"
+  tags:
+    - users
+
+- name: Add install directory and virtualenv
+  file: path={{item}} owner={{app_user}} group={{app_user}} state=directory mode=0775
+  become: True
+  with_items:
+    - "{{virtualenv}}"
+    - "{{install_dir}}"
+
+- name: Sync code to servers
+  remote_user: "{{ app_user }}"
+  synchronize: delete=yes src={{source_dir}} dest={{install_dir}} rsync_opts=--exclude-from={{inventory_dir}}/rsync-exclude
+  when: is_vagrant is not defined or not is_vagrant
+  notify:
+    - Restart uWSGI
+  tags:
+    - deploy
+
+- name: Push local_settings.py
+  remote_user: "{{app_user}}"
+  become: True
+  template: src=local_settings.py dest={{local_settings_file}}
+  notify:
+    - Restart uWSGI
+  tags:
+    - deploy
+    - config
+
+- name: Make virtualenv
+  become: True
+  pip: virtualenv={{virtualenv}} requirements={{requirements_file}}
+  tags:
+    - virtualenv
+  notify:
+    - Restart uWSGI

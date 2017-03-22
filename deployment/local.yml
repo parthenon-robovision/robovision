@@ -1,0 +1,4 @@
+- name: Install local ssh settings for ansible
+  hosts: localhost
+  roles:
+    - dev-box

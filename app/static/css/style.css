@@ -1,0 +1,32 @@
+#title {
+  font-family: 'Luckiest Guy', sans-serif;
+  font-size: 100px;
+}
+#theRobot {
+  width: 250px;
+  position: relative;
+}
+#spinner {
+  width: 110px;
+  height: 110px;
+  border-radius: 55px;
+  overflow: hidden;
+  background: #eee no-repeat center;
+  background-size: cover;
+  background-image: url(/static/img/circle.gif);
+  position: absolute;
+  top: 123px;
+  left: 67px;
+  display: none;
+}
+#eye {
+  width: 110px;
+  height: 110px;
+  border-radius: 55px;
+  overflow: hidden;
+  background: #eee no-repeat center;
+  position: absolute;
+  top: 123px;
+  left: 67px;
+  opacity: 0;
+}

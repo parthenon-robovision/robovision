@@ -1,0 +1,55 @@
+- name: Install nginx packages
+  become: True
+  apt: update_cache=yes pkg={{item}} state=present
+  with_items:
+    - nginx
+    - uwsgi
+
+- name: Install nginx configs
+  become: True
+  template: src=nginx.conf dest=/etc/nginx/sites-enabled/{{app_name}}.conf owner=root
+  tags:
+    - nginx
+  notify:
+    - Restart nginx
+
+- name: Ensure credentials dir
+  become: True
+  file: path="{{credentials_dir}}" state=directory
+
+- name: GoogleVision credentials
+  become: True
+  template: src=gcloud.json dest="{{credentials_dir}}/gcloud.json" owner=root
+  tags:
+    - nginx
+  notify:
+    - Restart nginx
+
+- name: Make sure default page is disabled
+  become: True
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  tags:
+    - nginx
+  notify:
+    - Restart nginx
+
+- name: disable sendfile
+  become: True
+  lineinfile: dest=/etc/nginx/nginx.conf regexp=sendfile  line="    sendfile off;"
+  tags:
+    - nginx
+  notify:
+    - Restart nginx
+
+- name: Make uWSGI log directory
+  become: True
+  file: path={{log_dir}} state=directory
+
+
+- name: Set up uWSGI
+  become: True
+  template: src=uwsgi.ini dest=/etc/uwsgi/apps-enabled/{{app_name}}.ini owner=root
+  tags:
+    - uWSGI
+  notify:
+    - Restart uWSGI

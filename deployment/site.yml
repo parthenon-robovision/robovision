@@ -1,0 +1,6 @@
+- name: Install Environment
+  hosts: app
+  roles:
+    - all
+    - nginx
+    - app

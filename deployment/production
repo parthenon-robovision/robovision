@@ -1,0 +1,5 @@
+[app]
+
+
+[production:children]
+app

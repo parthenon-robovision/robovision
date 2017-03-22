@@ -1,0 +1,14 @@
+---
+- name: Fail if this isn't a Vagrant box
+  fail: msg="I can't detect this as a Vagrant box. Failing in case you're doing something stupid, like trying to install fixtures in production..."
+  when: not is_vagrant
+
+- name: Copy fixtures to dev box
+  sudo: yes
+  copy: src="{{fixtures_url}}" dest=/tmp/fixtures.sql.bz2
+  when: dbs_created.changed and fixtures_url is defined
+
+- name: Install fixtures on dev box
+  sudo: yes
+  mysql_db: name={{db.name}} login_user={{db.user}} login_password={{db.password}} state=import target=/tmp/fixtures.sql.bz2
+  when: dbs_created.changed and fixtures_url is defined

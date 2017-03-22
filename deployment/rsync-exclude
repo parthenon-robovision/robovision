@@ -1,0 +1,8 @@
+/deployment
+/.git
+/.vagrant
+Vagrantfile
+local_settings.py
+*.pyc
+*.retry
+.gitignore

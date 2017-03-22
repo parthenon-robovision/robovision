@@ -1,0 +1,12 @@
+---
+- name: Ensure the key is set to 600
+  file: path="{{inventory_dir}}/keys/vagrant.key" mode=0600 state=file
+
+- name: Add SSH default host
+  lineinfile: regexp="{{item.regexp}}" dest=~/.ssh/config create=yes line="{{item.line}}" state=present
+  with_items:
+    - { regexp: "^Host default", line: "Host default" }
+    - { regexp: "^  HostName 192.168.111.222", line: "  HostName 192.168.111.222" }
+    - { regexp: "^  User vagrant", line: "  User vagrant" }
+    - { regexp: "^  StrictHostKeyChecking no", line: "  StrictHostKeyChecking no" }
+    - { regexp: "^  UserKnownHostsFile /dev/null", line: "  UserKnownHostsFile /dev/null" }
