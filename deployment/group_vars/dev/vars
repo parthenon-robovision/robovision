@@ -2,6 +2,7 @@ app_user: imagery
 app_name: imagery
 
 gcloud_credentials: "{{vault_gcloud_credentials}}"
+vision_api_credentials: "{{vault_vision_api_credentials}}"
 
 hostname: vagrant.dev-box
 credentials_dir: /srv/imagery_credentials

@@ -17,7 +17,15 @@
   become: True
   file: path="{{credentials_dir}}" state=directory
 
-- name: GoogleVision credentials
+- name: Vision API credentials
+  become: True
+  template: src=vision_api.json dest="{{credentials_dir}}/vision_api.json" owner=root
+  tags:
+    - nginx
+  notify:
+    - Restart nginx
+
+- name: GCloud credentials
   become: True
   template: src=gcloud.json dest="{{credentials_dir}}/gcloud.json" owner=root
   tags:

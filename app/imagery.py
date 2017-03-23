@@ -24,7 +24,7 @@ from google.cloud.exceptions import GoogleCloudError
 ImageLabel = namedtuple('ImageLabel', ['label', 'rank'])
 ImageRecognitionService = namedtuple(
     'ImageRecognitionService',
-    ['client', 'api_key', 'options']
+    ['client', 'options']
 )
 
 class ImageRecognitionException(Exception):
