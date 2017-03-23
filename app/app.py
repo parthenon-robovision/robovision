@@ -41,13 +41,18 @@ def home():
 def recognize(service_name):
 
     if service_name not in services:
-        pass
+        return ('Invalid service name', 400)
+
+    if service_name not in keys:
+        return ('API credentials not found', 500)
 
     service = services[service_name]
     api_key = keys[service_name]
 
+    if 'image' not in request.files:
+        return ('Image failed to upload', 400)
+
     f = request.files['image']
-    print f
     filename = basename(f.filename)
     (_, image_extension) = splitext(filename)
 
