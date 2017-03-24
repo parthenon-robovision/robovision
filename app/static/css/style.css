@@ -60,11 +60,17 @@
 }
 
 .dz-preview.dz-image-preview {
-  display: inline-block;
+  display: block;
   margin-right: 10px;
   margin-bottom: 10px;
 }
 
 .dz-preview.dz-image-preview img {
   border-radius: 50%;
+}
+
+.errortext {
+  color: red;
+  background-color: lightgrey;
+  font-family: monospace;
 }

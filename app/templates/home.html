@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Imagery: find similar images</title>
+    <title>ROBOVISION: Comparing image recognition APIs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cutestrap/1.3.1/css/cutestrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -56,6 +56,8 @@
       var pendingResults = 0;
       const beepboop = document.querySelector('#beepboop');
       const ding = document.querySelector('#ding');
+      const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
+      const services_count = service_names.length;
       Dropzone.autoDiscover = false;
       $(function() {
         var myDropzone = new Dropzone("#eye-form", {
@@ -63,10 +65,15 @@
             return("");
           },
           accept: function(file) {
-            console.log("accept");
-            $("#previews").html("");
             $("#results").text("");
             sendTheFile(file);
+          },
+          thumbnail(imageFile, dataURL){ // we have to catch it here to be able to clear #previews before new images come in, but because of that, we're having to add the thumbnails manually
+            if (pendingResults === 0) {
+              $("#previews").html(""); // checking to see if this is a new batch of images, if so, clear our #previews first
+            }
+            $("#previews").append(`<div class="dz-preview dz-image-preview" data-filename="${imageFile.name}"><img src=${dataURL} alt="${imageFile.name}"></div>`)
+            pendingResults += services_count;
           },
           previewTemplate: document.getElementById('preview-template').innerHTML,
           previewsContainer: "#previews",
@@ -75,11 +82,7 @@
       })
 
       function sendTheFile(file) {
-          console.log(file.name);
           var formData = new FormData();
-          const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
-          const services_count = service_names.length;
-          pendingResults += services_count;
           formData.append("image", file);
           $("#spinner").show();
           beepboop.play();
@@ -91,13 +94,16 @@
                 contentType: false,
                 type: "POST",
                 success: function(result) {
-                    $("#results").append(`<h4>${name} sees: ${result}</h4>`);
+                  if (result.length === 0) {
+                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} couldn't recognize this</h4>`);
+                  } else {
+                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} sees: ${result}</h4>`);
+                  }
                 },
                 error: function(jqXHR, status, errorText) {
-                    $("#results").append(`<h4 class="error">Oops, ${name} error! ${errorText} (It's not your fault, I promise)</h4>`);
+                  $(`#previews [data-filename='${file.name}']`).append(`<p class="error fw-bold fs-large">Oops, ${name} had an error! <span class="errortext">${errorText}</span> (It's not your fault, I promise)</p>`);
                 },
                 complete: function(jqXHR, status) {
-                  console.log(file.name + " finished!");
                   resultsBack();
                 }
             });
@@ -105,7 +111,6 @@
       }
       function resultsBack(jqXHR, status) {
         pendingResults -= 1;
-        console.log(pendingResults);
         if(pendingResults ===0){
           $("#spinner").hide();
           beepboop.pause();
