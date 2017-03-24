@@ -8,8 +8,7 @@
     <title>ROBOVISION: Comparing image recognition APIs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cutestrap/1.3.1/css/cutestrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
     <script src="/static/js/dropzone.js"></script>
 </head>
@@ -21,7 +20,7 @@
     <div class="grid">
       <div id="left_side">
         <div id="theRobot" class="ta-center">
-          <img src="/static/img/robot.svg" alt="I am a robot!">
+          <img src="/static/img/robot.svg" id="robot" alt="I am a robot!">
           <div id="spinner"></div>
           <form action="" id="eye-form" class="dropzone">
             <div class="dz-message"></div>
@@ -37,7 +36,6 @@
         <div id="results">
         </div>
       </div>
-
     </div>
   </div>
   <audio id="ding" src="/static/audio/ding.mp3" hidden preload="auto"></audio>
@@ -55,16 +53,18 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
   <script>
-      var files = [];
-      var file;
-      var pendingResults = 0;
       const beepboop = document.querySelector('#beepboop');
       const ding = document.querySelector('#ding');
       const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
       const services_count = service_names.length;
-      Dropzone.autoDiscover = false;
+      const robot = document.getElementById('robot');
       const soundSwitch = document.getElementById('sound_switch');
+      var files = [];
+      var file;
+      var pendingResults = 0;
+      var start = null;
       let sound = soundSwitch.checked;
+      Dropzone.autoDiscover = false;
       soundSwitch.addEventListener("change", function(){
         sound = soundSwitch.checked;
         if(sound !== true) { // shut off sounds
@@ -86,6 +86,7 @@
           thumbnail(imageFile, dataURL){ // we have to catch it here to be able to clear #previews before new images come in, but because of that, we're having to add the thumbnails manually
             if (pendingResults === 0) {
               $("#previews").html(""); // checking to see if this is a new batch of images, if so, clear our #previews first
+              window.requestAnimationFrame(hueFilter);
             }
             $("#previews").append(`<div class="dz-preview dz-image-preview" data-filename="${imageFile.name}"><img src=${dataURL} alt="${imageFile.name}"></div>`)
             pendingResults += services_count;
@@ -124,6 +125,7 @@
             });
           })
       }
+
       function resultsBack(jqXHR, status) {
         pendingResults -= 1;
         if(pendingResults ===0){
@@ -133,6 +135,18 @@
           if(sound) ding.play();
         }
       }
+
+      function hueFilter(timestamp) {
+        if (!start) start = timestamp;
+        var progress = timestamp - start;
+        robot.style.filter = "hue-rotate("+ progress / 2 % 360 + 'deg)';
+        if (pendingResults > 0 ) {
+          window.requestAnimationFrame(hueFilter);
+        } else {
+          robot.style.filter = "hue-rotate(0deg)";
+        }
+      }
+
   </script>
 </body>
 
