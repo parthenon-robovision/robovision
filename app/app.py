@@ -56,8 +56,6 @@ def recognize(service_name):
     filename = basename(f.filename)
     (_, image_extension) = splitext(filename)
 
-    print image_extension
-
     options = {}
     for option_name in service.options:
         t = type(service.options[option_name])

@@ -2,3 +2,5 @@ flask
 boto3
 cloudsight
 google-cloud-vision
+pytest
+pytest-flask
