@@ -36,7 +36,7 @@ def test_services(client, recognition_service, image):
 	for word in resp.json:
         # Account for CloudSight returning a single keyword of the form
         # "descriptive phrase".
-		words = [str(word).lower().replace('"', '').split(' ') for word in resp.json]
+		words = [str(word).lower().split(' ') for word in resp.json]
 		for word_list in words:
 			keywords += word_list
 	assert image[recognition_service] in keywords
