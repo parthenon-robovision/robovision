@@ -11,123 +11,108 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
     <link href="https://fonts.googleapis.com/css?family=Luckiest+Guy" rel="stylesheet">
+    <script src="/static/js/dropzone.js"></script>
 </head>
 
 <body>
   <div class="wrapper">
-    <h1 id="title">ROBOVISION!</h1>
-    <p>Click my eye or drag an image onto it and I will tell you what I think I see!</p>
+    <h1 id="title" class="ta-center">ROBOVISION!</h1>
+    <p class="ta-center">Click my eye or drag an image onto it and I will tell you what I think I see!</p>
     <div class="grid">
       <div id="left_side">
         <div id="theRobot" class="ta-center">
           <img src="/static/img/robot.svg" alt="I am a robot!">
           <div id="spinner"></div>
-          <div id="eye"></div>
+          <form action="" id="eye-form" class="dropzone">
+            <div class="dz-message"></div>
+          </form>
         </div>
-        <form id="image-selection-form" method="POST" enctype="multipart/form-data">
-          <p><input type="file" name="image"></p>
-        </form>
-        <p><button class="js-recognize-image-button">Submit</button></p>
       </div>
       <div id="right_side">
-        <div id="results"></div>
+        <div id="previews" class="dropzone-previews"></div>
+        <div id="results">
+        </div>
       </div>
 
     </div>
   </div>
-  <audio id="beepboop" src="/static/audio/beepboop.mp3" hidden preload="auto"></audio>
   <audio id="ding" src="/static/audio/ding.mp3" hidden preload="auto"></audio>
+  <audio id="beepboop" src="/static/audio/beepboop.mp3" hidden preload="auto"></audio>
+  <footer class="ta-center fs-small">
+    <a href='http://www.freepik.com/free-vector/cute-robots-collection_713858.htm'>Robot Designed by Freepik</a>
+    <a href="https://www.freesound.org/people/monsterjazzlicks/sounds/347513/">"Five Little Fingers" by monsterjazzlicks</a>
+  </footer>
+  <div id="preview-template" style="display: none;">
+    <div class="dz-preview dz-file-preview">
+      <img class="thumbnail" data-dz-thumbnail />
+    </div>
+  </div>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-    <script>
-        var files = [];
-        const beepboop = document.querySelector('#beepboop');
-        const ding = document.querySelector('#ding');
-
-        $('input[name="image"]').on('change', function(e) {
-            files = e.target.files;
-        });
-
-        $('.js-recognize-image-button').on('click', function() {
-            event.stopPropagation();
-            event.preventDefault();
-
-            if (files.length === 0) {
-                return;
-            }
-
-            var formData = new FormData();
-            formData.append("image", files[0]);
-            console.log("sending");
-            $("#spinner").show();
-            beepboop.play();
+  <script>
+      var files = [];
+      var file;
+      var pendingResults = 0;
+      const beepboop = document.querySelector('#beepboop');
+      const ding = document.querySelector('#ding');
+      Dropzone.autoDiscover = false;
+      $(function() {
+        var myDropzone = new Dropzone("#eye-form", {
+          url: function(files){
+            return("");
+          },
+          accept: function(file) {
+            console.log("accept");
+            $("#previews").html("");
             $("#results").text("");
-            $.ajax({
-                url: "/api/1/GoogleVision",
-                data: formData,
-                processData: false,
-                contentType: false,
-                type: "POST",
-                success: function(result) {
-                    $("#results").append("<p>GoogleVision sees: "+result+"</p>");
-                },
-                error: function(jqXHR, status, errorText) {
-                    $("#results").append("<p class='error'>Oops, GoogleVision error! "+errorText+" (It's not your fault, I promise)</p>");
-                },
-                complete: function(jqXHR, status) {
-                    console.log(status);
-                    $("#spinner").hide();
-                    beepboop.pause();
-                    ding.play();
-                }
-            });
-            $.ajax({
-                url: "/api/1/CloudSight",
-                data: formData,
-                processData: false,
-                contentType: false,
-                type: "POST",
-                success: function(result) {
-                    $("#results").append("<p>CloudSight sees: "+result+"</p>");
-                },
-                error: function(jqXHR, status, errorText) {
-                    $("#results").append("<p class='error'>Oops, CloudSight error! "+errorText+" (It's not your fault, I promise)</p>");
-                },
-                complete: function(jqXHR, status) {
-                    console.log(status);
-                    $("#spinner").hide();
-                    beepboop.pause();
-                    ding.play();
-                }
-            });
-            $.ajax({
-                url: "/api/1/Rekognition",
-                data: formData,
-                processData: false,
-                contentType: false,
-                type: "POST",
-                success: function(result) {
-                    $("#results").append("<p>Rekognition sees: "+result+"</p>");
-                },
-                error: function(jqXHR, status, errorText) {
-                    $("#results").append("<p class='error'>Oops, Rekognition error! "+errorText+" (It's not your fault, I promise)</p>");
-                },
-                complete: function(jqXHR, status) {
-                    console.log(status);
-                    $("#spinner").hide();
-                    beepboop.pause();
-                    ding.play();
-                }
-            });
+            sendTheFile(file);
+          },
+          previewTemplate: document.getElementById('preview-template').innerHTML,
+          previewsContainer: "#previews",
+          acceptedFiles: "image/*"
         });
-    </script>
-    <footer class="ta-center fs-small">
-      <a href='http://www.freepik.com/free-vector/cute-robots-collection_713858.htm'>Robot Designed by Freepik</a>
-      <a href="https://www.freesound.org/people/monsterjazzlicks/sounds/347513/">"Five Little Fingers" by monsterjazzlicks</a>
-    </footer>
+      })
+
+      function sendTheFile(file) {
+          console.log(file.name);
+          var formData = new FormData();
+          const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
+          const services_count = service_names.length;
+          pendingResults += services_count;
+          formData.append("image", file);
+          $("#spinner").show();
+          beepboop.play();
+          service_names.forEach(function(name) {
+            $.ajax({
+                url: `/api/1/${name}`,
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: "POST",
+                success: function(result) {
+                    $("#results").append(`<h4>${name} sees: ${result}</h4>`);
+                },
+                error: function(jqXHR, status, errorText) {
+                    $("#results").append(`<h4 class="error">Oops, ${name} error! ${errorText} (It's not your fault, I promise)</h4>`);
+                },
+                complete: function(jqXHR, status) {
+                  console.log(file.name + " finished!");
+                  resultsBack();
+                }
+            });
+          })
+      }
+      function resultsBack(jqXHR, status) {
+        pendingResults -= 1;
+        console.log(pendingResults);
+        if(pendingResults ===0){
+          $("#spinner").hide();
+          beepboop.pause();
+          ding.play();
+        }
+      }
+  </script>
 </body>
 
 </html>
