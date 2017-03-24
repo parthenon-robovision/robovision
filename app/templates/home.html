@@ -26,6 +26,10 @@
           <form action="" id="eye-form" class="dropzone">
             <div class="dz-message"></div>
           </form>
+          <label class="checkbox">
+            <input id="sound_switch" type="checkbox" checked/>
+            <span class="checkbox__label">Sound</span>
+          </label>
         </div>
       </div>
       <div id="right_side">
@@ -59,6 +63,17 @@
       const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
       const services_count = service_names.length;
       Dropzone.autoDiscover = false;
+      const soundSwitch = document.getElementById('sound_switch');
+      let sound = soundSwitch.checked;
+      soundSwitch.addEventListener("change", function(){
+        sound = soundSwitch.checked;
+        if(sound !== true) { // shut off sounds
+          beepboop.pause();
+          beepboop.currentTime = 0;
+          ding.pause();
+          ding.currentTime = 0;
+        }
+      });
       $(function() {
         var myDropzone = new Dropzone("#eye-form", {
           url: function(files){
@@ -85,7 +100,7 @@
           var formData = new FormData();
           formData.append("image", file);
           $("#spinner").show();
-          beepboop.play();
+          if(sound) beepboop.play();
           service_names.forEach(function(name) {
             $.ajax({
                 url: `/api/1/${name}`,
@@ -114,7 +129,8 @@
         if(pendingResults ===0){
           $("#spinner").hide();
           beepboop.pause();
-          ding.play();
+          beepboop.currentTime = 0;
+          if(sound) ding.play();
         }
       }
   </script>
