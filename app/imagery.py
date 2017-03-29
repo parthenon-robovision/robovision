@@ -1,11 +1,10 @@
 """ Tools for recognizing images via cloud services.
 
 Example:
-    image_data = BytesIO(some_binary_data)
     client_instance = CloudSight('XXXAPIKEYXXX')
-    all_image_labels = client_instance.recognize(image_data, '.jpg')
-    selected_image_labels = select_image_labels(
-        image_labels,
+    all_image_labels = client_instance.recognize(
+        image_data,
+        '.jpg',
         threshold=0.8,
         max_labels=5
     )
@@ -20,7 +19,13 @@ from cloudsight.errors import APIError
 from google.cloud import vision as googlevision # pylint: disable=import-error
 from google.cloud.exceptions import GoogleCloudError # pylint: disable=import-error
 
+# A ranked label has two parts: a label and a relevance rating (rank).
+# Relevance ratings vary from service to service and should be on a range 0 to 1
+# inclusive, where 1 is the best match and 0 is the worst possible match.
 ImageLabel = namedtuple('ImageLabel', ['label', 'rank'])
+
+# An image service has a client class that accepts an api_key on instantiation.
+# Options can be any dictionary from keywords to primitive values.
 ImageRecognitionService = namedtuple(
     'ImageRecognitionService',
     ['client', 'options']
@@ -35,15 +40,10 @@ class ImageRecogonitionService(object):
     """Framework for recognizing images via an API.
 
     Provides a mechanism for processing input images to produce ranked image
-    labels. A ranked label has two parts: a label and a relevance rating.
-    Relevance ratings vary from service to service and should be rescaled by
-    a subclass to be on a range 0 to 1 inclusive, where 1 is the best match
-    and 0 is the worst possible match.
-
-    Credentials are stored once in self._api_key at instance construction and
-    are subclass specific in structure.
+    labels. Credentials are stored once in self._api_key at instance
+    construction and are subclass specific in structure.
     """
-    def __init__(self, api_key=None):
+    def __init__(self, api_key):
         self._api_key = api_key
 
     def fetch_labels(self, image_data, image_extension):
@@ -54,17 +54,17 @@ class ImageRecogonitionService(object):
         raise NotImplementedError()
 
     def recognize(self, image_data, image_extension=None, threshold=0, max_labels=1):
-        """Apply the image recognition service to the supplied data and
+        """Apply the image recognition service to the supplied image data and
         constraints.
 
         image_data -- a byte string representing the image in a common format.
         image_extension -- indicates the image format used. Note, this is not
-            used by all services.
+            taken into account by all services.
         threshold -- all image labels ranked less than threshold will not be
             considered at all.
         max_labels -- the maximum number of image labels to return.
 
-        returns -- a list of image labels sorted by rank.
+        returns -- a list of image labels sorted by rank descending.
         """
         image_labels = self.fetch_labels(image_data, image_extension)
         return self.select_image_labels(image_labels, threshold, max_labels)
@@ -122,6 +122,8 @@ class CloudSight(ImageRecogonitionService):
 class GoogleVision(ImageRecogonitionService):
     """An interface to the Google Vision image recognition service.
 
+    Note, image_extension is not meaningful here.
+
     Example:
         client_instance = GoogleVision('XXXAPIKEYXXX')
         image_labels = client_instance.recognize(image_data)
@@ -138,6 +140,8 @@ class GoogleVision(ImageRecogonitionService):
 
 class Rekognition(ImageRecogonitionService):
     """An interface to the AWS Rekognition image recognition service.
+
+    Note, image_extension is not meaningful here.
 
     Example:
         client_instance = Rekognition({
@@ -156,9 +160,9 @@ class Rekognition(ImageRecogonitionService):
             response = client_instance.detect_labels(Image={'Bytes': image_data})
             labels = response['Labels']
             return [
+                # Rekognition ranks images on a scale of 0 to 100.
                 ImageLabel(label=label['Name'], rank=label['Confidence']/100.0)
                 for label in labels
             ]
         except ClientError as e:
-            print e
             raise ImageRecognitionException('Service unavailable')

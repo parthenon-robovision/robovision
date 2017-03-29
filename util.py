@@ -1,7 +1,6 @@
 #!/usr/bin/python
 '''Holds non-deploy utilities, such as launching the dev server and running
-tests. This is all done on the vagrant machine, but still might be better in
-Ansible.'''
+tests. This might be better managed by Ansible.'''
 
 import argparse
 from subprocess import call
@@ -51,6 +50,10 @@ RUN_TESTS_COMMAND = [
     ' '.join(ENVS), # !!! reversal problem
     'pytest'
 ]
+
+# We're considering shell=True to be okay here since every part of the command
+# line being passed off is defined above with no variation. But removing
+# shell=True wouldn't hurt.
 
 if args.command == 'run_dev_server':
     call(

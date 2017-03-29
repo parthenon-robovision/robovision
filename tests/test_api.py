@@ -1,6 +1,10 @@
 # pylint: disable=missing-docstring, import-error, redefined-outer-name
 # Note: I'm suppressing redefined-outer-name because pytest fixtures use
 # the same fixture name and parameter name by convention.
+''' These tests may assume certain results from certain services. These results
+seem very stable, but are not guaranteed. So failing tests DO NOT imply bad
+code. But passing tests are a good indication that all is right with the
+world.'''
 
 import pytest
 from werkzeug.datastructures import FileMultiDict
@@ -34,7 +38,10 @@ def test_services(client, recognition_service, image):
         d = FileMultiDict()
         d.add_file('image', f, image['file'])
         resp = client.post('/api/1/{}'.format(recognition_service), data=d)
-    print resp.json
+    print 'vvvv Response data vvvvvvvvvvvvvv'
+    print resp.data
+    print '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
+    assert resp.status_code == 200
     keywords = []
     for word in resp.json:
         # Account for CloudSight returning a single keyword of the form

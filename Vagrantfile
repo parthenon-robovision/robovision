@@ -7,9 +7,8 @@ Vagrant.configure(2) do |config|
     config.vm.network "forwarded_port", guest: 80, host: 8080
     config.vm.network :private_network, ip: "192.168.111.222"
     config.vm.hostname = 'default'
-    # config.ssh.port = 2222
 
-    config.vm.synced_folder "./", "/srv/www/imagery", :owner=>1002, :group=>1002
+    config.vm.synced_folder "./", "/srv/www/imagery", :owner=>'vagrant', :group=>'vagrant'
 
     config.ssh.insert_key = false
 
@@ -43,7 +42,6 @@ Vagrant.configure(2) do |config|
     config.vm.provision "ansible" do |ansible|
         ansible.inventory_path = "deployment/dev"
         ansible.playbook = "deployment/site.yml"
-        # ansible.verbose = 'vvvv'
         ansible.raw_arguments = ['--timeout=30']
         ansible.vault_password_file = 'vault_pass.py'
     end

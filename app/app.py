@@ -16,7 +16,6 @@ from imagery import (
 
 app = Flask(__name__)
 
-
 services = {
     'CloudSight': ImageRecognitionService(
         client=CloudSight,
@@ -32,6 +31,7 @@ services = {
     ),
 }
 
+# This only needs to happen once when a worker is loaded.
 with open(environ['IMAGERY_VISION_API_KEYS_FILE']) as keys_file:
     keys = json.loads(keys_file.read())
 
@@ -41,7 +41,6 @@ def home():
 
 @app.route('/api/1/<service_name>', methods=['POST'])
 def recognize(service_name):
-
     if service_name not in services:
         return ('Invalid service name', 400)
 
@@ -60,9 +59,11 @@ def recognize(service_name):
 
     options = {}
     for option_name in service.options:
-        t = type(service.options[option_name])
+        option_type = type(service.options[option_name])
         try:
-            options[option_name] = t(request.args.get(option_name, service.options[option_name]))
+            options[option_name] = option_type(
+                request.args.get(option_name, service.options[option_name])
+            )
         except ValueError:
             return ('Invalid value for option {}'.format(option_name), 400)
 
