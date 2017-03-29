@@ -5,12 +5,14 @@ set.
 
 ## Dev setup
 1. `git clone git+ssh://repository.parthenonsoftware.com/gitprojects/imagery`
-2. From within imagery/ : `vagrant up && ./test_server.sh`
+2. From within imagery/ : `vagrant up && ./util.py run_dev_server`
 3. Point your browser at localhost:5000 .
 4. Enjoy.
 
+To run tests `./util.py run_tests`.
+
 WARNING: for the moment, since the vagrant box has nothing else on it, starting
-the dev server via ./test_server.sh kills all things python just to make sure
+the dev server via `./util.py run_dev_server` kills all things python just to make sure
 nothing else is listening on port 5000. This could be made less bad.
 
 ## Infrastructure that might need improving
