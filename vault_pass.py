@@ -1,4 +1,8 @@
 #!/usr/bin/python
+''' Used by ansible-vault to retrieve the vault password from the environment
+variable IMAGERY_VAULT_PASSWORD during deploy.'''
+
+
 import os
 import sys
 

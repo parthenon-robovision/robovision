@@ -12,14 +12,13 @@ Example:
 """
 
 from collections import namedtuple
-import json
 
 import boto3
 from botocore.exceptions import ClientError
 import cloudsight
 from cloudsight.errors import APIError
-from google.cloud import vision as googlevision
-from google.cloud.exceptions import GoogleCloudError
+from google.cloud import vision as googlevision # pylint: disable=import-error
+from google.cloud.exceptions import GoogleCloudError # pylint: disable=import-error
 
 ImageLabel = namedtuple('ImageLabel', ['label', 'rank'])
 ImageRecognitionService = namedtuple(
@@ -156,7 +155,10 @@ class Rekognition(ImageRecogonitionService):
             )
             response = client_instance.detect_labels(Image={'Bytes': image_data})
             labels = response['Labels']
-            return [ImageLabel(label=label['Name'], rank=label['Confidence']/100.0) for label in labels]
+            return [
+                ImageLabel(label=label['Name'], rank=label['Confidence']/100.0)
+                for label in labels
+            ]
         except ClientError as e:
             print e
             raise ImageRecognitionException('Service unavailable')

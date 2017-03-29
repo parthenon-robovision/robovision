@@ -1,4 +1,7 @@
-from flask import url_for
+# pylint: disable=missing-docstring, import-error, redefined-outer-name
+# Note: I'm suppressing redefined-outer-name because pytest fixtures use
+# the same fixture name and parameter name by convention.
+
 import pytest
 from werkzeug.datastructures import FileMultiDict
 

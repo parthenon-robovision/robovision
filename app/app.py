@@ -1,19 +1,21 @@
+# pylint: disable=missing-docstring
 import json
 from os import environ
 from os.path import basename, splitext
 
 from flask import Flask, jsonify, render_template, request
 
-app = Flask(__name__)
-
+# pylint: disable=relative-import
 from imagery import (
     CloudSight,
     GoogleVision,
-    ImageLabel,
     ImageRecognitionException,
     ImageRecognitionService,
     Rekognition,
 )
+
+app = Flask(__name__)
+
 
 services = {
     'CloudSight': ImageRecognitionService(
