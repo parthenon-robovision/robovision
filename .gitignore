@@ -4,3 +4,4 @@
 .vagrant
 deployment/site.retry
 __pycache__
+app/local_settings.py
