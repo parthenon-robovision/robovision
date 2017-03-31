@@ -55,16 +55,26 @@
   <script>
       const beepboop = document.querySelector('#beepboop');
       const ding = document.querySelector('#ding');
-      const service_names = ["GoogleVision", "CloudSight", "Rekognition"]
+      const service_names = ["GoogleVision", "Rekognition", "CloudSight"]
       const services_count = service_names.length;
       const robot = document.getElementById('robot');
       const soundSwitch = document.getElementById('sound_switch');
+      const msg = new SpeechSynthesisUtterance();
       var files = [];
       var file;
       var pendingResults = 0;
       var start = null;
       let sound = soundSwitch.checked;
+      let voices = [];
       Dropzone.autoDiscover = false;
+      speechSynthesis.addEventListener('voiceschanged', populateVoices);
+      function populateVoices() {
+        voices = this.getVoices();
+      }
+      msg.onend = function(event){
+        if (pendingResults > 0) beepboop.volume = 1;
+      }
+
       soundSwitch.addEventListener("change", function(){
         sound = soundSwitch.checked;
         if(sound !== true) { // shut off sounds
@@ -114,6 +124,11 @@
                     $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} couldn't recognize this</h4>`);
                   } else {
                     $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} sees: ${result}</h4>`);
+                    if(name === "CloudSight" && sound){
+                      beepboop.volume = .3;
+                      msg.text = ", , , , , I see " + result; // adding a few commas up front gives us a bit of a pause before speaking
+                      speechSynthesis.speak(msg);
+                    }
                   }
                 },
                 error: function(jqXHR, status, errorText) {
