@@ -5,7 +5,6 @@ import re
 from collections import namedtuple
 import os
 
-SYNTAXNET_CONTAINER = os.environ['SYNTAXNET_CONTAINER']
 DESCRIPTORS = ('acomp', 'amod', 'appos', 'det',
     'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod', 'cc', 'conj')
 SUBJECTS = ('dobj', 'iobj', 'pobj', 'obj', 'subj', 'nsubj', 'csubj')
