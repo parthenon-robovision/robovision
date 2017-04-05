@@ -51,3 +51,28 @@
     - virtualenv
   notify:
     - Restart uWSGI
+
+- name: Escalate imagery user privileges
+  become: True
+  lineinfile: "dest=/etc/sudoers state=present regexp='^imagery' line='imagery ALL=(ALL) NOPASSWD: /usr/bin/docker'"
+
+- name: Add deploy@netstorage.net private key
+  template: src=imagery dest=.ssh/imagery mode=u=rw,g=,o=
+
+- name: Add deploy@netstorage.net to known_hosts
+  template: src=known_hosts dest=.ssh/known_hosts mode=u=rw,g=,o=
+
+- name: Check for SyntaxNet image
+  become: True
+  shell: "docker images | grep syntaxnet"
+  register: syntaxnet_image
+  ignore_errors: yes
+
+- name: Download SyntaxNet
+  shell: scp -i .ssh/imagery deploy@netstorage.internal:imagery/syntaxnet.tar.gz syntaxnet.tar.gz && gunzip syntaxnet.tar.gz
+  when: syntaxnet_image.rc != 0
+
+- name: Install syntaxnet
+  become: True
+  become_user: imagery
+  shell: sudo docker load < /home/vagrant/syntaxnet.tar

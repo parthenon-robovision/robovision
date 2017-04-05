@@ -45,5 +45,4 @@ Vagrant.configure(2) do |config|
         ansible.raw_arguments = ['--timeout=30']
         ansible.vault_password_file = 'vault_pass.py'
     end
-
 end

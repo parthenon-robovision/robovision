@@ -63,7 +63,7 @@ if args.command == 'run_dev_server':
             ' '.join(DEV_SERVER_COMMAND)
         ), shell=True
     )
-if args.command == 'run_tests':
+elif args.command == 'run_tests':
     call(
         '''ssh {} '{} "{}"' '''.format(
             ' '.join(SSH),

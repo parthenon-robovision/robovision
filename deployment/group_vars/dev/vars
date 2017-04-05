@@ -15,6 +15,8 @@ local_settings_file: "{{install_dir}}/app/local_settings.py"
 requirements_file: "{{install_dir}}/requirements.txt"
 workers: 1
 
+deploy_credentials: "{{vault_deploy_credentials}}"
+
 # DB settings if DB role is needed
 # db:
 #  host: localhost
@@ -31,6 +33,8 @@ packages:
   - libffi-dev
   - libssl-dev
   - build-essential
+  - docker.io
+  - sshpass
 
 # list app specific packages here if needed
 # app_packages:

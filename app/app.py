@@ -13,6 +13,7 @@ from imagery import (
     ImageRecognitionService,
     Rekognition,
 )
+from verbatim import list_subjects
 
 app = Flask(__name__)
 
@@ -70,7 +71,14 @@ def recognize(service_name):
     client = service.client(api_key)
     try:
         search_terms = client.recognize(f.read(), image_extension, **options)
+        if service_name == 'CloudSight':
+            subjects = list_subjects(search_terms[0])
+        else:
+            subjects = None
     except ImageRecognitionException as e:
         return (e.message, 400)
 
-    return jsonify(search_terms)
+    return jsonify({
+        'search_terms': search_terms,
+        'subjects': subjects
+    })
