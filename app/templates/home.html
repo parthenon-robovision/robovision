@@ -120,14 +120,19 @@
                 contentType: false,
                 type: "POST",
                 success: function(result) {
-                  if (result.length === 0) {
+                  if (result.search_terms.length === 0) {
                     $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} couldn't recognize this</h4>`);
                   } else {
-                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} sees: ${result}</h4>`);
+                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large ${name}">${name} sees: ${result.search_terms}</h4>`);
                     if(name === "CloudSight" && sound){
                       beepboop.volume = .3;
-                      msg.text = ", , , , , I see " + result; // adding a few commas up front gives us a bit of a pause before speaking
+                      //   msg.text = ", , , , , I see " + result; // adding a few commas up front gives us a bit of a pause before speaking
+                      msg.text = "Image subjects identified...";
                       speechSynthesis.speak(msg);
+                      let grid = $('<div class="grid fs-base fw-normal">');
+                      grid.append('<div class="column--light">');
+                      grid.append($('<div class="column--heavy">').text('Image subjects: ' + result.subjects.join(', ')));
+                      $(`.${name}`).append(grid);
                     }
                   }
                 },
