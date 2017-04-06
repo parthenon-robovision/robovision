@@ -60,7 +60,7 @@ class ImageRecogonitionService(object):
         image_data -- a byte string representing the image in a common format.
         image_extension -- indicates the image format used. Note, this is not
             taken into account by all services.
-        threshold -- all image labels ranked less than threshold will not be
+        threshold -- any image labels ranked less than threshold will not be
             considered at all.
         max_labels -- the maximum number of image labels to return.
 

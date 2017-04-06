@@ -5,8 +5,9 @@ import re
 from collections import namedtuple
 import os
 
+#'cc', 'conj'
 DESCRIPTORS = ('acomp', 'amod', 'appos', 'det',
-    'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod', 'cc', 'conj')
+    'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod')
 SUBJECTS = ('dobj', 'iobj', 'pobj', 'obj', 'subj', 'nsubj', 'csubj')
 
 Node = namedtuple('Node', ['value', 'children'])
@@ -40,7 +41,9 @@ def _crawl_descriptors(children, thing):
                 _crawl_descriptors(child.children, thing)
 
 def _crawl_tree(node, done):
-    if node.value.function in SUBJECTS or node.value.function == 'ROOT' and node.value.pos == 'nn':
+    if (node.value.function in SUBJECTS
+        or node.value.function == 'ROOT' and node.value.pos == 'nn'
+        or node.value.function == 'conj' and node.value.pos == 'nn'):
         thing = Thing(noun=node.value, descriptors=[])
         _crawl_descriptors(node.children, thing)
         done.append(thing)
@@ -69,17 +72,13 @@ def list_subjects(phrase):
     except Exception as e:
         print e
         raise
-    print phrase
     lines = parser.communicate(phrase)[0].split('\n')
-    print lines
     table = []
     for line in lines:
         if re.match('^\d+.*$', line):
             table.append(line.split('\t')[:-1])
 
     terms = [_line_to_terms(line) for line in table]
-
-    print terms
 
     for term in terms:
         if term.parent == 0:
