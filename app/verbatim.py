@@ -5,7 +5,6 @@ import re
 from collections import namedtuple
 import os
 
-#'cc', 'conj'
 DESCRIPTORS = ('acomp', 'amod', 'appos', 'det',
     'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod')
 SUBJECTS = ('dobj', 'iobj', 'pobj', 'obj', 'subj', 'nsubj', 'csubj')

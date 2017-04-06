@@ -70,7 +70,6 @@ def recognize(service_name):
 
     client = service.client(api_key)
     try:
-        #('a boy and girl in a car', None)#
         search_terms = client.recognize(f.read(), image_extension, **options)
         if service_name == 'CloudSight':
             subjects = list_subjects(search_terms[0])
