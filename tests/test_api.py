@@ -15,16 +15,16 @@ def recognition_service(request):
 
 @pytest.fixture(params=[
     {
-        'file': 'nicestar.jpg',
-        'GoogleVision': 'star',
-        'Rekognition': 'origami',
-        'CloudSight': 'star'
+        'file': 'chess.jpg',
+        'GoogleVision': 'chess',
+        'Rekognition': 'clock',
+        'CloudSight': 'hat',
     },
     {
         'file': 'cat.jpg',
         'GoogleVision': 'cat',
         'Rekognition': 'cat',
-        'CloudSight': 'cat'
+        'CloudSight': 'cat',
     },
 ])
 def image(request):
@@ -43,10 +43,12 @@ def test_services(client, recognition_service, image):
     print '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     assert resp.status_code == 200
     keywords = []
-    for word in resp.json:
-        # Account for CloudSight returning a single keyword of the form
-        # "descriptive phrase".
-        words = [str(word).lower().split(' ') for word in resp.json]
-        for word_list in words:
-            keywords += word_list
+    results = resp.json
+    words = [str(word).lower().split(' ') for word in results['search_terms']]
+    for word_list in words:
+        keywords += word_list
     assert image[recognition_service] in keywords
+
+    if recognition_service == 'CloudSight':
+        keywords = [str(subject).lower().split(' ')[-1] for subject in results['subjects']]
+        assert image[recognition_service] in keywords
