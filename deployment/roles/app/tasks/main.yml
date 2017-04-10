@@ -36,7 +36,6 @@
 
 - name: Push local_settings.py
   remote_user: "{{app_user}}"
-  become: True
   template: src=local_settings.py dest={{local_settings_file}}
   notify:
     - Restart uWSGI
@@ -45,22 +44,21 @@
     - config
 
 - name: Make virtualenv
-  become: True
   pip: virtualenv={{virtualenv}} requirements={{requirements_file}}
   tags:
     - virtualenv
   notify:
     - Restart uWSGI
 
-- name: Escalate imagery user privileges
-  become: True
-  lineinfile: "dest=/etc/sudoers state=present regexp='^imagery' line='imagery ALL=(ALL) NOPASSWD: /usr/bin/docker'"
+#- name: Escalate imagery user privileges
+#  become: True
+#  lineinfile: "dest=/etc/sudoers state=present regexp='^imagery' line='imagery ALL=(ALL) NOPASSWD: /usr/bin/docker'"
 
-- name: Add deploy@netstorage.net private key
-  template: src=imagery dest=.ssh/imagery mode=u=rw,g=,o=
+#- name: Add deploy@netstorage.net private key
+#  template: src=imagery dest=.ssh/imagery mode=u=rw,g=,o=
 
-- name: Add deploy@netstorage.net to known_hosts
-  template: src=known_hosts dest=.ssh/known_hosts mode=u=rw,g=,o=
+#- name: Add deploy@netstorage.net to known_hosts
+#  template: src=known_hosts dest=.ssh/known_hosts mode=u=rw,g=,o=
 
 - name: Check for SyntaxNet image
   become: True
@@ -69,10 +67,15 @@
   ignore_errors: yes
 
 - name: Download SyntaxNet
-  shell: scp -i .ssh/imagery deploy@netstorage.internal:imagery/syntaxnet.tar.gz syntaxnet.tar.gz && gunzip syntaxnet.tar.gz
+  get_url: url="{{syntaxnet_url}}" dest="/tmp/syntaxnet.tar.gz"
   when: syntaxnet_image.rc != 0
 
 - name: Install syntaxnet
   become: True
-  become_user: imagery
-  shell: sudo docker load < /home/vagrant/syntaxnet.tar
+  shell: "zcat /tmp/syntaxnet.tar.gz | docker load"
+
+- name: Ensure www-data has access to docker
+  become: True
+  user: name=www-data groups=docker state=present
+  tags: 
+    - docker

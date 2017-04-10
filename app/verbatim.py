@@ -62,7 +62,7 @@ def list_subjects(phrase):
     try:
         master_fd, slave_fd = pty.openpty()
         parser = Popen(
-            ['sudo', 'docker', 'run', '--rm', '-i', 'local/syntaxnet-docker', 'syntaxnet/demo.sh'],
+            ['/usr/bin/docker', 'run', '--rm', '-i', 'local/syntaxnet-docker', 'syntaxnet/demo.sh'],
             # ['sudo docker run --rm -i tensorflow/syntaxnet:v01 sudo syntaxnet/demo.sh'],
             # ['sudo', 'docker', 'restart', 'syntaxnet'],
             stdin=PIPE,

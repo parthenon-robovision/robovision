@@ -27,7 +27,7 @@ ImageLabel = namedtuple('ImageLabel', ['label', 'rank'])
 # An image service has a client class that accepts an api_key on instantiation.
 # Options can be any dictionary from keywords to primitive values.
 ImageRecognitionService = namedtuple(
-    'ImageRecognitionService',
+    'ImageRecognitionServiceClient',
     ['client', 'options']
 )
 
@@ -36,7 +36,7 @@ class ImageRecognitionException(Exception):
     pass
 
 
-class ImageRecogonitionService(object):
+class ImageRecognitionServiceClient(object):
     """Framework for recognizing images via an API.
 
     Provides a mechanism for processing input images to produce ranked image
@@ -90,7 +90,7 @@ class ImageRecogonitionService(object):
         return selected_image_labels[:min(len(selected_image_labels), max_labels)]
 
 
-class CloudSight(ImageRecogonitionService):
+class CloudSight(ImageRecognitionServiceClient):
     """An interface to the CloudSight image recognition service.
 
     Example:
@@ -119,7 +119,7 @@ class CloudSight(ImageRecogonitionService):
             raise ImageRecognitionException('Service unavailable')
 
 
-class GoogleVision(ImageRecogonitionService):
+class GoogleVision(ImageRecognitionServiceClient):
     """An interface to the Google Vision image recognition service.
 
     Note, image_extension is not meaningful here.
@@ -138,7 +138,7 @@ class GoogleVision(ImageRecogonitionService):
             raise ImageRecognitionException('Service unavailable')
 
 
-class Rekognition(ImageRecogonitionService):
+class Rekognition(ImageRecognitionServiceClient):
     """An interface to the AWS Rekognition image recognition service.
 
     Note, image_extension is not meaningful here.
