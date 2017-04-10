@@ -1,4 +1,5 @@
 from subprocess import check_output, Popen, PIPE
+import sys
 import pty
 import json
 import re
@@ -6,7 +7,7 @@ from collections import namedtuple
 import os
 
 DESCRIPTORS = ('acomp', 'amod', 'appos', 'det',
-    'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod')
+    'predet', 'mwe', 'rcmod', 'nn', 'num', 'quantmod', 'cc', 'conj')
 SUBJECTS = ('dobj', 'iobj', 'pobj', 'obj', 'subj', 'nsubj', 'csubj')
 
 Node = namedtuple('Node', ['value', 'children'])
@@ -33,11 +34,14 @@ def print_tree(tree, lead):
 def _crawl_descriptors(children, thing):
     if children is None:
         return
-    for child in children:
-        if child.value.function in DESCRIPTORS:
-            thing.descriptors.append(child.value)
-            if child.children is not None:
-                _crawl_descriptors(child.children, thing)
+    if len(children) >= 2 and children[-2].value.function == 'cc' and children[-1].value.pos == 'nn':
+        return
+    for i in xrange(len(children)):
+        if children[i].value.function in DESCRIPTORS:
+            if children[i].value.pos != 'dt':
+                thing.descriptors.append(children[i].value)
+            if children[i].children is not None:
+                _crawl_descriptors(children[i].children, thing)
 
 def _crawl_tree(node, done):
     if (node.value.function in SUBJECTS
@@ -72,6 +76,7 @@ def list_subjects(phrase):
         print e
         raise
     lines = parser.communicate(phrase)[0].split('\n')
+    p.append('\n'.join(lines))
     table = []
     for line in lines:
         if re.match('^\d+.*$', line):
