@@ -18,7 +18,7 @@ def recognition_service(request):
         'file': 'chess.jpg',
         'GoogleVision': 'chess',
         'Rekognition': 'clock',
-        'CloudSight': 'hat',
+        'CloudSight': 'man',
     },
     {
         'file': 'cat.jpg',
