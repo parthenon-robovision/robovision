@@ -14,6 +14,7 @@ socket: /var/run/uwsgi/app/{{app_name}}/socket
 local_settings_file: "{{install_dir}}/app/local_settings.py"
 requirements_file: "{{install_dir}}/requirements.txt"
 workers: 1
+syntaxnet_url: "http://repository.parthenonsoftware.com/ubuntu/syntaxnet.tar.gz"
 
 deploy_credentials: "{{vault_deploy_credentials}}"
 

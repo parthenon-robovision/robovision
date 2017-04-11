@@ -21,7 +21,7 @@ SSH = [
 
 BASH = [
     'sudo',
-    '-u', 'imagery',
+    '-u', 'www-data',
     'bash', '-c',
 ]
 

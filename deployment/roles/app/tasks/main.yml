@@ -45,6 +45,8 @@
 
 - name: Make virtualenv
   pip: virtualenv={{virtualenv}} requirements={{requirements_file}}
+  become: True
+  become_user: "{{ app_user }}"
   tags:
     - virtualenv
   notify:
@@ -77,5 +79,5 @@
 - name: Ensure www-data has access to docker
   become: True
   user: name=www-data groups=docker state=present
-  tags: 
+  tags:
     - docker

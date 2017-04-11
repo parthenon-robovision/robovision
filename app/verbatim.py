@@ -25,7 +25,6 @@ def _make_tree(root, descriptions):
     return Node(value=root, children=children)
 
 def print_tree(tree, lead):
-    print '{}{} ({}, {})'.format(lead, tree.value.word, tree.value.pos, tree.value.function)
     if tree.children is None:
         return
     for child in tree.children:
@@ -36,10 +35,16 @@ def _crawl_descriptors(children, thing):
         return
     if len(children) >= 2 and children[-2].value.function == 'cc' and children[-1].value.pos == 'nn':
         return
+    skip = False
     for i in xrange(len(children)):
         if children[i].value.function in DESCRIPTORS:
-            if children[i].value.pos != 'dt':
+            if children[i].value.function == 'cc' and children[i + 1].value.pos == 'nn':
+                skip = True
+                continue
+            if children[i].value.pos != 'dt' and not skip:
                 thing.descriptors.append(children[i].value)
+            else:
+                skip = False
             if children[i].children is not None:
                 _crawl_descriptors(children[i].children, thing)
 
@@ -67,8 +72,6 @@ def list_subjects(phrase):
         master_fd, slave_fd = pty.openpty()
         parser = Popen(
             ['/usr/bin/docker', 'run', '--rm', '-i', 'local/syntaxnet-docker', 'syntaxnet/demo.sh'],
-            # ['sudo docker run --rm -i tensorflow/syntaxnet:v01 sudo syntaxnet/demo.sh'],
-            # ['sudo', 'docker', 'restart', 'syntaxnet'],
             stdin=PIPE,
             stdout=PIPE
         )
@@ -76,7 +79,7 @@ def list_subjects(phrase):
         print e
         raise
     lines = parser.communicate(phrase)[0].split('\n')
-    p.append('\n'.join(lines))
+    print '\n'.join(lines)
     table = []
     for line in lines:
         if re.match('^\d+.*$', line):
