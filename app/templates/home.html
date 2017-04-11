@@ -130,7 +130,7 @@
                       speechSynthesis.speak(msg);
                       let grid = $('<div class="grid fs-base fw-normal">');
                       grid.append('<div class="column--light">');
-                      grid.append($('<div class="column--heavy">').text('Image subjects: ' + result.subjects.join(', ')));
+                      grid.append($('<div class="column--heavy">').text('Image subjects: ' + result.subjects.join('; ')));
                       $(`.${name}`).append(grid);
                     }
                   }
