@@ -121,9 +121,9 @@
                 type: "POST",
                 success: function(result) {
                   if (result.search_terms.length === 0) {
-                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} couldn't recognize this</h4>`);
+                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large">${name} couldn't recognize this</p>`);
                   } else {
-                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large ${name}">${name} sees: ${result.search_terms}</h4>`);
+                    $(`#previews [data-filename='${file.name}']`).append(`<p class="fw-bold fs-large ${name}">${name} sees: ${result.search_terms.join(', ')}</p>`);
                     if(name === "CloudSight" && sound){
                       beepboop.volume = .3;
                       msg.text = ", , , , , I see " + result.search_terms[0]; // adding a few commas up front gives us a bit of a pause before speaking

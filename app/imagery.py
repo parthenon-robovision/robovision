@@ -161,7 +161,7 @@ class Rekognition(ImageRecognitionServiceClient):
             labels = response['Labels']
             return [
                 # Rekognition ranks images on a scale of 0 to 100.
-                ImageLabel(label=label['Name'], rank=label['Confidence']/100.0)
+                ImageLabel(label=label['Name'].lower(), rank=label['Confidence']/100.0)
                 for label in labels
             ]
         except ClientError as e:
